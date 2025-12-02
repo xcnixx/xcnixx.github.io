@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="no">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>IT-BOT — Discord assistent</title>
+<title>IT-BOT — Timeplan</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
@@ -22,6 +22,8 @@
   --shadow-hover: 0 20px 40px rgba(10, 24, 83, 0.65); /* midnight blue underglow */
   --transition: all 0.3s ease;
   --border-radius: 16px;
+  --card-border: rgba(255,255,255,0.05);
+  --highlight: var(--accent2);
 }
 
 /* Grunnleggende stiler for alle elementer og body */
@@ -41,20 +43,6 @@
 
 #kontakt a:hover {
   color: #5fb0ff; /* Farge ved hover */
-}
-
-/* Her er knappen til timeplan */
-button {
-  background: linear-gradient(90deg, #295191);
-  color: white;
-  border: solid 1px #ffffff79;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 14px;
-  position: relative;
-  overflow: hidden;
 }
 
 
@@ -774,172 +762,310 @@ footer {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* All CSS for Timeplan - tilpasset for konsistens med glassmorfisme */
+/* ---------- TIMEPLAN GRID ---------- */
+.schedule-section {
+    margin-top: 40px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 20px;
+}
+
+.schedule-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 2rem;
+    color: var(--text);
+    background: linear-gradient(90deg, #ffd36b, #ff6b8a, #5fb0ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* 5 kolonner på PC - overskriver generell .schedule-grid for denne konteksten */
+.schedule-grid.timeplan-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 25px;
+    padding: 10px;
+}
+
+/* ---------- DAGSKORT - tilpasset .card-stil for konsistens ---------- */
+.day-card {
+    padding: 20px;
+    border-radius: var(--border-radius);
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    transition: var(--transition);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.day-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+.day-card:hover {
+  box-shadow: 0 25px 50px rgba(37, 86, 179, 0.322);
+  transform: translateY(-5px) scale(1.02);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.day-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Accent stripe i kortet - tilpasset med eksisterende variabler */
+.day-card::after {
+    content: "";
+    position: absolute;
+    height: 180%;
+    width: 90px;
+    opacity: 0.25;
+    right: -30px;
+    top: -40px;
+    transform: rotate(-32deg);
+    background: var(--highlight);
+}
+
+/* ---------- LEKSJONSBOKSER - tilpasset todo-item-stil ---------- */
+.lesson-box {
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));
+    border: 1px solid var(--card-border);
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: var(--transition);
+}
+
+.lesson-box:hover {
+  background: rgba(255,255,255,0.05);
+  transform: translateX(5px);
+}
+
+.lesson-time {
+    font-size: 0.85rem;
+    color: var(--muted);
+    opacity: 0.8;
+}
+
+.lesson-subject {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 2px;
+    color: var(--text);
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+/* Tablet – 2 kolonner */
+@media (max-width: 1100px) {
+    .schedule-grid.timeplan-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobil – 1 kolonne */
+@media (max-width: 650px) {
+    .schedule-grid.timeplan-grid {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 </head>
 <body>
-<div class="pill-nav-container">
-<nav class="pill-nav" aria-label="Primary">
-<a class="pill-logo" href="index.html" aria-label="Home">
-<span class="logo-text">IT-BOT</span>
-</a>
-<div class="pill-nav-items desktop-only">
-<ul class="pill-list" role="menubar">
-<li role="none">
-<a role="menuitem" href="#funksjoner" class="pill" aria-label="Funksjoner">
-<span class="hover-circle" aria-hidden="true"></span>
-<span class="label-stack">
-<span class="pill-label">Funksjoner</span>
-<span class="pill-label-hover" aria-hidden="true">Funksjoner</span>
-</span>
-</a>
-</li>
-<li role="none">
-<a role="menuitem" href="#kommandoer" class="pill" aria-label="Kommandoer">
-<span class="hover-circle" aria-hidden="true"></span>
-<span class="label-stack">
-<span class="pill-label">Kommandoer</span>
-<span class="pill-label-hover" aria-hidden="true">Kommandoer</span>
-</span>
-</a>
-</li>
-<li role="none">
-<a role="menuitem" href="#kode" class="pill" aria-label="Hvordan lage bot">
-<span class="hover-circle" aria-hidden="true"></span>
-<span class="label-stack">
-<span class="pill-label">Hvordan lage bot</span>
-<span class="pill-label-hover" aria-hidden="true">Hvordan lage bot</span>
-</span>
-</a>
-</li>
-<li role="none">
-<a role="menuitem" href="#kontakt" class="pill" aria-label="Kontakt meg">
-<span class="hover-circle" aria-hidden="true"></span>
-<span class="label-stack">
-<span class="pill-label">Kontakt meg</span>
-<span class="pill-label-hover" aria-hidden="true">Kontakt meg</span>
-</span>
-</a>
-</li>
-      <li role="none">
-        <a role="menuitem" href="form.html" class="pill" aria-label="Skjema">
-          <span class="hover-circle" aria-hidden="true"></span>
-          <span class="label-stack">
-            <span class="pill-label">Ticket</span>
-            <span class="pill-label-hover" aria-hidden="true">Ticket</span>
-          </span>
-        </a>
-      </li>
-</ul>
-</div>
-<button class="mobile-menu-button mobile-only" aria-label="Toggle menu">
-<span class="hamburger-line"></span>
-<span class="hamburger-line"></span>
-</button>
-</nav>
-<div class="mobile-menu-popover mobile-only">
-<ul class="mobile-menu-list">
-<li>
-<a href="#funksjoner" class="mobile-menu-link">Funksjoner</a>
-</li>
-<li>
-<a href="#kommandoer" class="mobile-menu-link">Kommandoer</a>
-</li>
-<li>
-<a href="#kode" class="mobile-menu-link">Hvordan lage bot</a>
-</li>
-<li>
-<a href="#kontakt" class="mobile-menu-link">Kontakt meg</a>
-</li>
-          <li>
-            <a href="form.html" class="mobile-menu-link">Ticket</a>
-          </li>
-</ul>
-</div>
+  <div class="pill-nav-container">
+    <nav class="pill-nav" aria-label="Primary">
+      <a class="pill-logo" href="index.html" aria-label="Home"><span class="logo-text">IT-BOT</span></a>
+      <div class="pill-nav-items desktop-only">
+        <ul class="pill-list" role="menubar">
+          <li role="none"><a role="menuitem" href="index.html#funksjoner" class="pill" aria-label="Funksjoner"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Funksjoner</span><span class="pill-label-hover" aria-hidden="true">Funksjoner</span></span></a></li>
+          <li role="none"><a role="menuitem" href="index.html#kommandoer" class="pill" aria-label="Kommandoer"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Kommandoer</span><span class="pill-label-hover" aria-hidden="true">Kommandoer</span></span></a></li>
+          <li role="none"><a role="menuitem" href="index.html#kode" class="pill" aria-label="Hvordan lage bot"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Hvordan lage bot</span><span class="pill-label-hover" aria-hidden="true">Hvordan lage bot</span></span></a></li>
+          <li role="none"><a role="menuitem" href="index.html#kontakt" class="pill" aria-label="Kontakt meg"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Kontakt meg</span><span class="pill-label-hover" aria-hidden="true">Kontakt meg</span></span></a></li>
+          <li role="none"><a role="menuitem" href="form.html" class="pill is-active" aria-label="Skjema"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Ticket</span><span class="pill-label-hover" aria-hidden="true">Skjema</span></span></a></li>
+        </ul>
+      </div>
+      <button class="mobile-menu-button mobile-only" aria-label="Toggle menu"><span class="hamburger-line"></span><span class="hamburger-line"></span></button>
+    </nav>
+    <div class="mobile-menu-popover mobile-only">
+      <ul class="mobile-menu-list">
+        <li><a href="index.html#funksjoner" class="mobile-menu-link">Funksjoner</a></li>
+        <li><a href="index.html#kommandoer" class="mobile-menu-link">Kommandoer</a></li>
+        <li><a href="index.html#kode" class="mobile-menu-link">Hvordan lage bot</a></li>
+        <li><a href="index.html#kontakt" class="mobile-menu-link">Kontakt meg</a></li>
+        <li><a href="form.html" class="mobile-menu-link is-active">Ticket</a></li>
+      </ul>
+    </div>
+  </div>
 </div>
 
+<!-- HERO -->
 <section class="hero">
-<h1>IT-BOT — Discord assistent</h1>
-<p> IT-BOT er en Discord-bot laget for klassen IT-BOT. Den hjelper deg med å holde styr på <b>timeplanen</b> og <b>oppgaver</b>. Den kjører med <code>discord.py</code> og støtter påminnelser med tidsformat som <code>10s</code>, <code>5m</code>, <code>2h</code>, <code>1d</code>. </p>
+<h1>IT-BOT — Timeplan</h1>
+<p>
+IT-BOT er en Discord-bot laget for klassen. Den hjelper deg med å holde styr på 
+<b>timeplan</b>, <b>skole-oppgaver</b>.</b><br>
+På denne siden finner du timeplaner for 1IMA og 2ITA.
+</p>
 </section>
 
-<section class="flex-cards" id="funksjoner">
-<div class="card scroll-reveal">
-<h3>📅 Timeplan</h3>
-<p>Skriv ukedagen (<code>!mandag 2ITA / 1IMA</code>, <code>!tirsdag 2ITA / 1IMA</code>, osv.) så svarer boten med plan for dagen.</p>
-<p><b>Eksempel:</b> <code>!mandag 2ITA/1IMA</code> gir dagens fag og tider.</p>
-<p>Skriver du <code>!timeplan 2ITA / 1IMA</code> så får du timeplanen for uken</p>
+<!-- HER ER TIMEPLAN -->
+<section class="schedule-section ita">
+    <h2 class="schedule-title">📘 Timeplan – 2ITA</h2>
 
-<p>Trykk på knappen under for å se timeplanen:</p>
-<a href="timeplan.html"><button>Timeplan</button></a>
+    <div class="schedule-grid timeplan-grid">
 
-</div>
+        <!-- MANDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Mandag</h3>
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">Driftstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">Driftstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">Brukerstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">Brukerstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">Kroppsøving Vg2</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">Kroppsøving Vg2</div></div>
+        </div>
 
-<div class="card scroll-reveal">
-<h3>📝 ToDo-liste</h3>
-<p>Legg til oppgaver, se listen eller fjern oppgaver. Støtter også påminnelser.</p>
-<ul>
-<li><code>!todo leggtil Gjør lekser</code></li>
-<li><code>!todo leggtil 10m Skriv notater</code> (med påminnelse)</li>
-<li><code>!todo vis</code></li>
-<li><code>!todo fjern 1</code></li>
-</ul>
-</div>
+        <!-- TIRSDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Tirsdag</h3>
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">Norsk</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">Norsk</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">Utvikling</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">Utvikling</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">Driftstøtte</div></div>
+        </div>
+
+        <!-- ONSDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Onsdag</h3>
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">Driftstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">Driftstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">Driftstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">Utvikling</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">Samfunnskunnskap</div></div>
+            <div class="lesson-box"><div class="lesson-time">13:40 - 14:25 (7)</div><div class="lesson-subject">Samfunnskunnskap</div></div>
+            <div class="lesson-box"><div class="lesson-time">14:35 - 15:20 (8)</div><div class="lesson-subject">Samfunnskunnskap</div></div>
+        </div>
+
+        <!-- TORSDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Torsdag</h3>
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">Utvikling</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">Utvikling</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">Utvikling</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">Brukerstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">Brukerstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">Brukerstøtte</div></div>
+            <div class="lesson-box"><div class="lesson-time">13:40 - 14:25 (7)</div><div class="lesson-subject">Norsk</div></div>
+            <div class="lesson-box"><div class="lesson-time">14:35 - 15:20 (8)</div><div class="lesson-subject">Norsk</div></div>
+        </div>
+
+        <!-- FREDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Fredag</h3>
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">YFF / praksis</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">YFF / praksis</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">YFF / praksis</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">YFF / praksis</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">YFF / praksis</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">YFF / praksis</div></div>
+        </div>
+
+    </div>
 </section>
 
-<section class="flex-cards" id="kommandoer">
-<div class="card scroll-reveal">
-<h3>Alle kommandoer</h3>
-<ul>
-<li><code>!mandag</code>, <code>!tirsdag</code>, … <code>!fredag</code> → viser plan for dagen</li>
-<li><code>!timeplan 2ITA / 1IMA</code> → viser timeplan for uken</li>
-<li><code>!todo leggtil &lt;oppgave&gt;</code> → legger til oppgave</li>
-<li><code>!todo leggtil &lt;tid&gt; &lt;oppgave&gt;</code> → legger til oppgave med påminnelse</li>
-<li><code>!todo vis</code> → viser dine oppgaver</li>
-<li><code>!todo fjern &lt;nummer&gt;</code> → fjerner oppgave</li>
-</ul>
-</div>
-<div class="card scroll-reveal">
-<h3>Påminnelser</h3>
-<p>Du kan skrive tid rett etter <code>leggtil</code>:</p>
-<ul>
-<li><code>10s</code> = 10 sekunder</li>
-<li><code>5m</code> = 5 minutter</li>
-<li><code>2h</code> = 2 timer</li>
-<li><code>1d</code> = 1 dag</li>
-</ul>
-</div>
-</section>
 
-<!--     HVORDAN LAGER MAN EN DISCORD BOT             -->
-<section class="flex-cards" id="kode">
-<div class="card scroll-reveal">
-<h3>🤖 Hvordan lage en Discord-bot</h3>
-<p>For å lage en Discord-bot trenger du to ting: en bot-bruker i Discord Developer Portal og et program som kjører boten.</p>
-<ul>
-<li>Gå til <a href="https://discord.com/developers/applications" target="_blank">Discord Developer Portal</a> og opprett en ny applikasjon.</li>
-<li>Under <b>Bot</b>-fanen kan du lage en bot-bruker og få en token (nøkkelen boten bruker for å logge inn).</li>
-<li>Gi boten nødvendige <b>intents</b> (f.eks. tilgang til meldinger).</li>
-<li>Inviter boten til serveren din via en <b>OAuth2 URL</b> som genereres i portalen.</li>
-<li>Jeg anbefaler at du bruker enten PyCharm eller Visual Studio Code for å skrive koden i python, <br>
-Jeg brukte PyCharm for å skrive koden for denne dicsord-botten.</li>
-</ul>
-<p>Jeg anbefaler at du ser på YouTube-videoer om hvordan lage Discord-boter. Det kan være mye å sette seg inn i når man først starter</p>
-<p>På programmeringssiden bruker man ofte <code>Python</code> med biblioteket <code>discord.py</code>. Der skriver man kommandoene boten skal svare på, og kjører koden lokalt eller på en server. Når boten kjører med din token, vil den logge inn og begynne å reagere på meldinger i serveren din.</p>
-<p>Dette er grunnmuren – etterpå kan du bygge på med funksjoner som timeplan, oppgavelister eller musikkspiller!</p>
-</div>
-</section>
+<section class="schedule-section ima">
+    <h2 class="schedule-title">📘 Timeplan – 1IMA</h2>
 
-<section class="flex-cards" id="kontakt">
-<div class="card scroll-reveal">
-<h3>📬 Kontakt meg</h3>
-<p>Har du spørsmål eller forslag til boten? Du kan nå meg her:</p>
-<ul style="list-style:none;padding-left:0;line-height:1.8em;">
-<li>📧 <b>Mail:</b> <a href="mailto:noahgmoen@gmail.com">noahgmoen@gmail.com</a></li>
-<li>💬 <b>Discord:</b> xcnixx</li>
-<li>👻 <b>Snapchat:</b> noah-moen</li>
-<li>📂 <b>Submit a ticket a <a href="form.html" class="ticket">here</a></b></li>
-</ul>
-</div>
+    <div class="schedule-grid timeplan-grid">
+
+        <!-- MANDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Mandag</h3>
+
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">Engelsk</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">Engelsk</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">Produksjon og historiefortelling</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">Produksjon og historiefortelling</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">Produksjon og historiefortelling</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">Konseptutvikling og programmering</div></div>
+        </div>
+
+        <!-- TIRSDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Tirsdag</h3>
+
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">YFF</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">YFF</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">YFF</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">YFF</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">YFF</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">YFF</div></div>
+            <div class="lesson-box"><div class="lesson-time">13:40 - 14:25 (7)</div><div class="lesson-subject">YFF</div></div>
+            <div class="lesson-box"><div class="lesson-time">14:35 - 15:20 (8)</div><div class="lesson-subject">YFF</div></div>
+        </div>
+
+        <!-- ONSDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Onsdag</h3>
+
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">Engelsk</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">Engelsk</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">Engelsk</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">Matematikk</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">Konseptutvikling og programmering</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">Konseptutvikling og programmering</div></div>
+            <div class="lesson-box"><div class="lesson-time">13:40 - 14:25 (7)</div><div class="lesson-subject">Konseptutvikling og programmering</div></div>
+            <div class="lesson-box"><div class="lesson-time">14:35 - 15:20 (8)</div><div class="lesson-subject">Konseptutvikling og programmering</div></div>
+        </div>
+
+        <!-- TORSDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Torsdag</h3>
+
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">Matematikk</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">Matematikk</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">Teknologiforståelse</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">Teknologiforståelse</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">Teknologiforståelse</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">Teknologiforståelse</div></div>
+            <div class="lesson-box"><div class="lesson-time">13:40 - 14:25 (7)</div><div class="lesson-subject">Kroppsøving</div></div>
+            <div class="lesson-box"><div class="lesson-time">14:35 - 15:20 (8)</div><div class="lesson-subject">Kroppsøving</div></div>
+        </div>
+
+        <!-- FREDAG -->
+        <div class="day-card scroll-reveal">
+            <h3>Fredag</h3>
+
+            <div class="lesson-box"><div class="lesson-time">08:05 - 08:50 (1)</div><div class="lesson-subject">Teknologiforståelse</div></div>
+            <div class="lesson-box"><div class="lesson-time">08:50 - 09:35 (2)</div><div class="lesson-subject">Teknologiforståelse</div></div>
+            <div class="lesson-box"><div class="lesson-time">09:50 - 10:35 (3)</div><div class="lesson-subject">Naturfag</div></div>
+            <div class="lesson-box"><div class="lesson-time">10:45 - 11:30 (4)</div><div class="lesson-subject">Naturfag</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:00 - 12:45 (5)</div><div class="lesson-subject">Produksjon og historiefortelling</div></div>
+            <div class="lesson-box"><div class="lesson-time">12:45 - 13:30 (6)</div><div class="lesson-subject">Produksjon og historiefortelling</div></div>
+        </div>
+
+    </div>
 </section>
 
 <footer>
@@ -1028,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', () => {
   gsap.to('.hero', { opacity: 1, y: 0, duration: 1, ease: 'power2.out' });
   
   // Animer kortene med forsinkelse
-  gsap.to('.card', { 
+  gsap.to('.day-card', { 
     opacity: 1, 
     y: 0, 
     duration: 0.8, 
