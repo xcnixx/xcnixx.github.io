@@ -19,14 +19,20 @@
   --muted: #9aa6b2;
   --text: #e6eef6;
   --shadow: 0 10px 30px rgba(2,6,23,0.6);
-  --shadow-hover: 0 20px 40px rgba(59, 57, 163, 0.541);
-  --transition: all 0.5s ease;
+  --shadow-hover: 0 20px 40px rgba(10, 24, 83, 0.65); /* midnight blue underglow */
+  --transition: all 0.3s ease;
   --border-radius: 16px;
 }
 
 /* Grunnleggende stiler for alle elementer og body */
 * {
   box-sizing: border-box;
+}
+
+.ticket {
+  text-decoration: underline;
+  color: blue;
+  font-weight: 700;
 }
 
 html, body {
@@ -310,7 +316,7 @@ header {
 }
 
 .btn.ghost:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,0.05);
   color: var(--text);
 }
 
@@ -750,7 +756,7 @@ footer {
 <body>
 <div class="pill-nav-container">
 <nav class="pill-nav" aria-label="Primary">
-<a class="pill-logo" href="#" aria-label="Home">
+<a class="pill-logo" href="index.html" aria-label="Home">
 <span class="logo-text">IT-BOT</span>
 </a>
 <div class="pill-nav-items desktop-only">
@@ -791,6 +797,15 @@ footer {
 </span>
 </a>
 </li>
+      <li role="none">
+        <a role="menuitem" href="form.html" class="pill" aria-label="Skjema">
+          <span class="hover-circle" aria-hidden="true"></span>
+          <span class="label-stack">
+            <span class="pill-label">Ticket</span>
+            <span class="pill-label-hover" aria-hidden="true">Ticket</span>
+          </span>
+        </a>
+      </li>
 </ul>
 </div>
 <button class="mobile-menu-button mobile-only" aria-label="Toggle menu">
@@ -812,6 +827,9 @@ footer {
 <li>
 <a href="#kontakt" class="mobile-menu-link">Kontakt meg</a>
 </li>
+          <li>
+            <a href="form.html" class="mobile-menu-link">Skjema</a>
+          </li>
 </ul>
 </div>
 </div>
@@ -891,6 +909,7 @@ Jeg brukte PyCharm for å skrive koden for denne dicsord-botten.</li>
 <li>📧 <b>Mail:</b> <a href="mailto:noahgmoen@gmail.com">noahgmoen@gmail.com</a></li>
 <li>💬 <b>Discord:</b> xcnixx</li>
 <li>👻 <b>Snapchat:</b> noah-moen</li>
+<li>📂 <b>Submit a ticket a <a href="form.html" class="ticket">here</a></b></li>
 </ul>
 </div>
 </section>
@@ -1038,10 +1057,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const allLinks = document.querySelectorAll('.pill, .mobile-menu-link');
   const updateActive = () => {
     const hash = window.location.hash || '#';
+    const currentFile = window.location.pathname.split('/').pop() || 'index.html';
     allLinks.forEach(link => {
       link.classList.remove('is-active');
-      if (link.getAttribute('href') === hash) {
-        link.classList.add('is-active');
+      const href = link.getAttribute('href') || '';
+
+      if (href.startsWith('#')) {
+        if (href === hash) link.classList.add('is-active');
+      } else {
+        // Compare file names (last segment) for page links
+        const linkFile = href.split('/').pop();
+        if (linkFile === currentFile) link.classList.add('is-active');
+        // treat root and index equivalently
+        if ((linkFile === '' || linkFile === 'index.html') && (currentFile === '' || currentFile === 'index.html')) {
+          link.classList.add('is-active');
+        }
       }
     });
   };

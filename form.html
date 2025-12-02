@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IT-BOT — Kontakt (Skjema)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+/* keep the same CSS variables and styles as index.html (trimmed for brevity) */
+:root{--bg:#0f0f23;--card:#1a1a2e;--glass:rgba(255,255,255,0.05);--accent1:linear-gradient(135deg,#ff6b8a,#ff3d6e);--accent2:linear-gradient(135deg,#5fb0ff,#3b82f6);--accent3:linear-gradient(135deg,#30d48a,#06b38a);--accent4:linear-gradient(135deg,#ffd36b,#ff9d6b);--muted:#9aa6b2;--text:#e6eef6;--shadow:0 10px 30px rgba(2,6,23,0.6);--shadow-hover:0 20px 40px rgba(10,24,83,0.65);--transition:all 0.3s ease;--border-radius:16px}
+*{box-sizing:border-box}
+html,body{height:100%;scroll-behavior:smooth}
+body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:radial-gradient(ellipse at 10% 10%, rgba(255,255,255,0.02) 0%, transparent 20%), linear-gradient(180deg, #0b1320 0%, #0f1720 100%);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
+/* Pill-nav og mobilmeny-stiler - kopi fra index.html */
+.pill-nav-container {
+  position: fixed;
+  top: 1em;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99;
+  width: auto;
+  backdrop-filter: blur(10px);
+  background: rgba(16, 24, 39, 0.9);
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.pill-nav-container:hover {
+  background: rgba(16, 24, 39, 0.95);
+  box-shadow: var(--shadow-hover);
+}
+
+@media (max-width: 768px) {
+  .pill-nav-container {
+    width: 100%;
+    left: 0;
+    transform: none;
+    top: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+  }
+}
+
+.pill-nav {
+  --nav-h: 42px;
+  --logo: 36px;
+  --pill-pad-x: 18px;
+  --pill-gap: 3px;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .pill-nav {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0 1rem;
+    background: transparent;
+  }
+}
+
+.pill-nav-items {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--nav-h);
+  border-radius: 9999px;
+}
+
+.pill-logo {
+  width: auto;
+  height: var(--nav-h);
+  border-radius: 9999px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.pill-logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  font-weight: 800;
+  font-size: 18px;
+  background: linear-gradient(90deg, #ffd36b, #ff6b8a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pill-list {
+  list-style: none;
+  display: flex;
+  align-items: stretch;
+  gap: var(--pill-gap);
+  margin: 0;
+  padding: 3px;
+  height: 100%;
+}
+
+.pill-list > li {
+  display: flex;
+  height: 100%;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 var(--pill-pad-x);
+  background: var(--pill-bg, rgba(255,255,255,0.03));
+  color: var(--pill-text, #9aa6b2);
+  text-decoration: none;
+  border-radius: 9999px;
+  box-sizing: border-box;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.pill .hover-circle {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  border-radius: 50%;
+  background: var(--base, #000);
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.pill .label-stack {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  z-index: 2;
+}
+
+.pill .pill-label {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  line-height: 1;
+  will-change: transform;
+}
+
+.pill .pill-label-hover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--hover-text, #fff);
+  z-index: 3;
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.pill.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: var(--base, #000);
+  border-radius: 50px;
+  z-index: 4;
+}
+
+@media (max-width: 768px) {
+  .pill {
+    font-size: 12px;
+    padding: 0 12px;
+  }
+  .pill .hover-circle,
+  .pill .label-stack,
+  .pill .pill-label-hover {
+    display: none;
+  }
+  .pill {
+    color: var(--pill-text, #e6eef6);
+    background: var(--pill-bg, rgba(255,255,255,0.05));
+  }
+  .pill:hover,
+  .pill:active {
+    background: rgba(255,255,255,0.1);
+    color: var(--hover-text, #ffffff);
+  }
+}
+
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+
+@media (max-width: 768px) { .desktop-only { display: none; } .mobile-only { display: block; } }
+
+.mobile-menu-button {
+  width: var(--nav-h);
+  height: var(--nav-h);
+  border-radius: 50%;
+  background: var(--base, #000);
+  border: none;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: var(--transition);
+}
+
+.mobile-menu-button:hover { transform: scale(1.1); }
+
+@media (max-width: 768px) { .mobile-menu-button { display: flex; } }
+
+.hamburger-line { width: 16px; height: 2px; background: var(--pill-text, #fff); border-radius: 1px; transition: all 0.3s ease; transform-origin: center; }
+
+.mobile-menu-popover { position: absolute; top: 3em; left: 1rem; right: 1rem; background: rgba(25, 35, 55, 0.95); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); z-index: 998; opacity: 0; transform-origin: top center; visibility: hidden; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+
+.mobile-menu-list { list-style: none; margin: 0; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+.mobile-menu-popover .mobile-menu-link { display: block; padding: 14px 20px; color: #e6eef6; background-color: rgba(255,255,255,0.1); text-decoration: none; font-size: 16px; font-weight: 500; border-radius: 12px; transition: all 0.2s ease; }
+
+.mobile-menu-popover .mobile-menu-link:hover { cursor: pointer; background-color: rgba(59,130,246,0.3); color: #ffffff; transform: translateX(5px); }
+
+/* Spesifikke variabler for pill-nav */
+.pill-nav { --base: #101827; --pill-bg: rgba(255,255,255,0.03); --pill-text: #9aa6b2; --hover-text: #e6eef6; }
+/* Hero & card */
+.hero{text-align:center;padding:80px 20px 40px;margin:0 auto;max-width:900px}
+.hero h1{font-size:40px;margin:6px 0 16px;letter-spacing:-0.02em;background:linear-gradient(90deg,#ffd36b,#ff6b8a,#5fb0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card{padding:30px;border-radius:var(--border-radius);background:var(--glass);backdrop-filter:blur(10px);box-shadow:var(--shadow);position:relative;border:1px solid rgba(255,255,255,0.05);max-width:720px;margin:28px auto}
+/* form styling */
+form#ticketForm{display:flex;flex-direction:column;gap:12px}
+label{font-weight:700;color:var(--muted);font-size:13px}
+input[type="email"],textarea{padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.18);color:var(--text);outline:none;font-family:inherit}
+button[type="submit"].btn{background:linear-gradient(90deg,#3b82f6,#8b5cf6);color:white;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+footer{color:var(--muted);text-align:center;padding:40px 20px;border-top:1px solid rgba(255,255,255,0.05);margin-top:40px}
+  </style>
+</head>
+<body>
+  <div class="pill-nav-container">
+    <nav class="pill-nav" aria-label="Primary">
+      <a class="pill-logo" href="index.html" aria-label="Home"><span class="logo-text">IT-BOT</span></a>
+      <div class="pill-nav-items desktop-only">
+        <ul class="pill-list" role="menubar">
+          <li role="none"><a role="menuitem" href="index.html#funksjoner" class="pill" aria-label="Funksjoner"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Funksjoner</span><span class="pill-label-hover" aria-hidden="true">Funksjoner</span></span></a></li>
+          <li role="none"><a role="menuitem" href="index.html#kommandoer" class="pill" aria-label="Kommandoer"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Kommandoer</span><span class="pill-label-hover" aria-hidden="true">Kommandoer</span></span></a></li>
+          <li role="none"><a role="menuitem" href="index.html#kode" class="pill" aria-label="Hvordan lage bot"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Hvordan lage bot</span><span class="pill-label-hover" aria-hidden="true">Hvordan lage bot</span></span></a></li>
+          <li role="none"><a role="menuitem" href="index.html#kontakt" class="pill" aria-label="Kontakt meg"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Kontakt meg</span><span class="pill-label-hover" aria-hidden="true">Kontakt meg</span></span></a></li>
+          <li role="none"><a role="menuitem" href="form.html" class="pill is-active" aria-label="Skjema"><span class="hover-circle" aria-hidden="true"></span><span class="label-stack"><span class="pill-label">Ticket</span><span class="pill-label-hover" aria-hidden="true">Skjema</span></span></a></li>
+        </ul>
+      </div>
+      <button class="mobile-menu-button mobile-only" aria-label="Toggle menu"><span class="hamburger-line"></span><span class="hamburger-line"></span></button>
+    </nav>
+    <div class="mobile-menu-popover mobile-only">
+      <ul class="mobile-menu-list">
+        <li><a href="index.html#funksjoner" class="mobile-menu-link">Funksjoner</a></li>
+        <li><a href="index.html#kommandoer" class="mobile-menu-link">Kommandoer</a></li>
+        <li><a href="index.html#kode" class="mobile-menu-link">Hvordan lage bot</a></li>
+        <li><a href="index.html#kontakt" class="mobile-menu-link">Kontakt meg</a></li>
+        <li><a href="form.html" class="mobile-menu-link is-active">Ticket</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="hero">
+    <h1>Kontakt meg — Ticket</h1>
+    <p class="muted" style="color:var(--muted)">Send en melding eller rapport — Jeg skal fikse problemet så snart som mulig.</p> <br>
+    <p class="muted" style="color:var(--muted)">Hvis du har spørsmål kan du kontakte meg direkte på Discord <a href="https://discord.com/users/1047936395081171035" class="ticket">Her</a></p>
+  </section>
+
+  <div class="card">
+    <h3>Send melding</h3>
+    <p style="color:var(--muted);margin-bottom:12px">Fyll inn epost og meldingen din — jeg svarer så snart jeg kan.</p>
+    <form id="ticketForm" action="https://formspree.io/f/mwpgbrll" method="POST">
+      <label for="email">E-post</label>
+      <input id="email" type="email" name="email" placeholder="din@epost.no" required />
+
+      <label for="message">Melding</label>
+      <textarea id="message" name="message" rows="6" placeholder="Skriv meldingen din her..." required></textarea>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <button type="submit" class="btn">Send</button>
+        <div id="status" style="color:var(--muted);font-size:13px"></div>
+      </div>
+    </form>
+  </div>
+
+  <footer>
+    <p>© 2025 IT-BOT — Laget for læring og organisering.</p>
+  </footer>
+
+  <script>
+    const tlRefs = []; const activeTweenRefs = []; let isMobileMenuOpen = false; const ease = 'power3.out';
+    function layout(){ if(window.innerWidth>768){ const circles = document.querySelectorAll('.hover-circle'); circles.forEach((circle,index)=>{ const pill = circle.parentElement; const rect = pill.getBoundingClientRect(); const w = rect.width; const h = rect.height; const R = ((w*w)/4 + h*h)/(2*h); const D = Math.ceil(2*R) + 2; const delta = Math.ceil(R - Math.sqrt(Math.max(0, R*R - (w*w)/4))) + 1; const originY = D - delta; circle.style.width = D + 'px'; circle.style.height = D + 'px'; circle.style.bottom = -delta + 'px'; gsap.set(circle,{ xPercent:-50, scale:0, transformOrigin:`50% ${originY}px` }); const label = pill.querySelector('.pill-label'); const white = pill.querySelector('.pill-label-hover'); if(label) gsap.set(label,{ y:0 }); if(white) gsap.set(white,{ y:h+12, opacity:0 }); if(tlRefs[index]) tlRefs[index].kill(); const tl = gsap.timeline({ paused:true }); tl.to(circle,{ scale:1.2, xPercent:-50, duration:2, ease },0); if(label) tl.to(label,{ y:-(h+8), duration:2, ease },0); if(white){ gsap.set(white,{ y: Math.ceil(h + 100), opacity: 0 }); tl.to(white,{ y:0, opacity:1, duration:2, ease },0);} tlRefs[index] = tl; }); } }
+
+    function handleEnter(index){ if(window.innerWidth>768){ const tl = tlRefs[index]; if(!tl) return; if(activeTweenRefs[index]) activeTweenRefs[index].kill(); activeTweenRefs[index] = tl.tweenTo(tl.duration(), { duration: 0.3, ease, overwrite: 'auto' }); } }
+    function handleLeave(index){ if(window.innerWidth>768){ const tl = tlRefs[index]; if(!tl) return; if(activeTweenRefs[index]) activeTweenRefs[index].kill(); activeTweenRefs[index] = tl.tweenTo(0, { duration: 0.2, ease, overwrite: 'auto' }); } }
+
+    function scrollReveal(){ const revealElements=document.querySelectorAll('.scroll-reveal'); const windowHeight=window.innerHeight; const revealPoint=150; revealElements.forEach(element=>{ const elementTop = element.getBoundingClientRect().top; if(elementTop < windowHeight - revealPoint){ element.classList.add('revealed'); } }) }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      layout();
+      gsap.to('.hero',{ opacity:1, y:0, duration:1, ease:'power2.out'});
+      gsap.to('.card',{ opacity:1, y:0, duration:0.8, stagger:0.2, ease:'power2.out', delay:0.1});
+
+      if(window.innerWidth>768){ const pills = document.querySelectorAll('.pill'); pills.forEach((pill,index)=>{ pill.addEventListener('mouseenter', ()=> handleEnter(index)); pill.addEventListener('mouseleave', ()=> handleLeave(index)); }) }
+
+      const hamburger = document.querySelector('.mobile-menu-button'); const menu = document.querySelector('.mobile-menu-popover'); gsap.set(menu,{ visibility:'hidden', opacity:0, scaleY:1 }); hamburger.addEventListener('click', ()=>{ isMobileMenuOpen = !isMobileMenuOpen; const lines = hamburger.querySelectorAll('.hamburger-line'); if(isMobileMenuOpen){ gsap.to(lines[0],{ rotation:45, y:3, duration:0.3, ease }); gsap.to(lines[1],{ rotation:-45, y:-3, duration:0.3, ease }); gsap.set(menu,{ visibility:'visible' }); gsap.fromTo(menu,{ opacity:0, y:10, scaleY:1 },{ opacity:1, y:0, scaleY:1, duration:0.3, ease, transformOrigin:'top center' }); } else { gsap.to(lines[0],{ rotation:0, y:0, duration:0.3, ease }); gsap.to(lines[1],{ rotation:0, y:0, duration:0.3, ease }); gsap.to(menu,{ opacity:0, y:10, scaleY:1, duration:0.2, ease, transformOrigin:'top center', onComplete:()=> gsap.set(menu, { visibility: 'hidden' }) }); } });
+
+      const mobileLinks = document.querySelectorAll('.mobile-menu-link');
+      mobileLinks.forEach(link => {
+        link.addEventListener('click', ()=>{
+          isMobileMenuOpen = false;
+          const lines = hamburger.querySelectorAll('.hamburger-line');
+          gsap.to(lines[0],{ rotation:0, y:0, duration:0.3, ease });
+          gsap.to(lines[1],{ rotation:0, y:0, duration:0.3, ease });
+          gsap.to(menu,{ opacity:0, y:10, scaleY:1, duration:0.2, ease, transformOrigin:'top center', onComplete:()=> gsap.set(menu,{ visibility:'hidden' }) });
+        });
+      });
+
+      const logo = document.querySelector('.pill-logo'); const navItems = document.querySelector('.pill-nav-items'); gsap.set(logo,{ scale:0 }); gsap.to(logo,{ scale:1, duration:0.6, ease }); gsap.set(navItems,{ width:0, overflow:'hidden' }); gsap.to(navItems,{ width:'auto', duration:0.6, ease });
+
+      const allLinks = document.querySelectorAll('.pill, .mobile-menu-link');
+      const updateActive = () => {
+        const hash = window.location.hash || '#';
+        const currentFile = window.location.pathname.split('/').pop() || 'index.html';
+        allLinks.forEach(link => {
+          link.classList.remove('is-active');
+          const href = link.getAttribute('href') || '';
+          if (href.startsWith('#')) {
+            if (href === hash) link.classList.add('is-active');
+          } else {
+            const linkFile = href.split('/').pop();
+            if (linkFile === currentFile) link.classList.add('is-active');
+            if ((linkFile === '' || linkFile === 'index.html') && (currentFile === '' || currentFile === 'index.html')) link.classList.add('is-active');
+          }
+        });
+      };
+      window.addEventListener('hashchange', updateActive);
+      updateActive();
+
+      // form handling
+      const form = document.getElementById('ticketForm'); const statusDiv = document.getElementById('status');
+      form.addEventListener('submit', async (e) => { e.preventDefault(); let data = new FormData(form); let res = await fetch(form.action, { method: form.method, body: data, headers: { 'Accept': 'application/json' } }); if (res.ok) { statusDiv.innerHTML = 'Takk — meldingen er sendt!'; form.reset(); } else { statusDiv.innerHTML = 'Det skjedde en feil ved innsending.'; } });
+
+      // initial scroll reveal
+      scrollReveal();
+    });
+
+    window.addEventListener('resize', layout);
+    window.addEventListener('scroll', scrollReveal);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+  </script>
+
+  
+</body>
+</html>
