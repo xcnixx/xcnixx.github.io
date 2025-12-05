@@ -293,17 +293,20 @@ footer{color:var(--muted);text-align:center;padding:40px 20px;border-top:1px sol
     <h3>Send melding</h3>
     <p style="color:var(--muted);margin-bottom:12px">Fyll inn epost og meldingen din — jeg svarer så snart jeg kan.</p>
     <form id="ticketForm" action="https://formspree.io/f/mwpgbrll" method="POST">
-      <label for="email">E-post</label>
-      <input id="email" type="email" name="email" placeholder="din@epost.no" required />
+        <!-- Legg til subject for Formspree / Discord (kan bruke templating i Formspree) -->
+        <input type="hidden" name="subject" value="Ny ticket fra {{email}}">
+        <label for="email">E-post</label>
+        <input id="email" type="email" name="email" placeholder="din@epost.no" required />
 
-      <label for="message">Melding</label>
-      <textarea id="message" name="message" rows="6" placeholder="Skriv meldingen din her..." required></textarea>
+        <label for="message">Melding</label>
+        <textarea id="message" name="message" rows="6" placeholder="Skriv meldingen din her..." required></textarea>
 
-      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
-        <button type="submit" class="btn">Send</button>
-        <div id="status" style="color:var(--muted);font-size:13px"></div>
-      </div>
-    </form>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <button type="submit" class="btn">Send</button>
+          <div id="status" style="color:var(--muted);font-size:13px"></div>
+        </div>
+      </form>
+    </div>
   </div>
 
   <footer>
@@ -311,6 +314,8 @@ footer{color:var(--muted);text-align:center;padding:40px 20px;border-top:1px sol
   </footer>
 
   <script>
+    // REPLACE_WITH_YOUR_WEBHOOK -> sett inn din Discord webhook-URL her (se instruksjoner nederst)
+    const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/REPLACE_WITH_YOUR_WEBHOOK';
     const tlRefs = []; const activeTweenRefs = []; let isMobileMenuOpen = false; const ease = 'power3.out';
     function layout(){ if(window.innerWidth>768){ const circles = document.querySelectorAll('.hover-circle'); circles.forEach((circle,index)=>{ const pill = circle.parentElement; const rect = pill.getBoundingClientRect(); const w = rect.width; const h = rect.height; const R = ((w*w)/4 + h*h)/(2*h); const D = Math.ceil(2*R) + 2; const delta = Math.ceil(R - Math.sqrt(Math.max(0, R*R - (w*w)/4))) + 1; const originY = D - delta; circle.style.width = D + 'px'; circle.style.height = D + 'px'; circle.style.bottom = -delta + 'px'; gsap.set(circle,{ xPercent:-50, scale:0, transformOrigin:`50% ${originY}px` }); const label = pill.querySelector('.pill-label'); const white = pill.querySelector('.pill-label-hover'); if(label) gsap.set(label,{ y:0 }); if(white) gsap.set(white,{ y:h+12, opacity:0 }); if(tlRefs[index]) tlRefs[index].kill(); const tl = gsap.timeline({ paused:true }); tl.to(circle,{ scale:1.2, xPercent:-50, duration:2, ease },0); if(label) tl.to(label,{ y:-(h+8), duration:2, ease },0); if(white){ gsap.set(white,{ y: Math.ceil(h + 100), opacity: 0 }); tl.to(white,{ y:0, opacity:1, duration:2, ease },0);} tlRefs[index] = tl; }); } }
 
@@ -361,8 +366,69 @@ footer{color:var(--muted);text-align:center;padding:40px 20px;border-top:1px sol
       updateActive();
 
       // form handling
-      const form = document.getElementById('ticketForm'); const statusDiv = document.getElementById('status');
-      form.addEventListener('submit', async (e) => { e.preventDefault(); let data = new FormData(form); let res = await fetch(form.action, { method: form.method, body: data, headers: { 'Accept': 'application/json' } }); if (res.ok) { statusDiv.innerHTML = 'Takk — meldingen er sendt!'; form.reset(); } else { statusDiv.innerHTML = 'Det skjedde en feil ved innsending.'; } });
+      const form = document.getElementById('ticketForm');
+      const statusDiv = document.getElementById('status');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        statusDiv.textContent = 'Sender...';
+        const formData = new FormData(form);
+        try {
+          const res = await fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (res.ok) {
+            statusDiv.innerHTML = 'Takk — meldingen er sendt!';
+
+            // Send til Discord webhook (valgfritt). Bytt DISCORD_WEBHOOK_URL over.
+            if (DISCORD_WEBHOOK_URL && !DISCORD_WEBHOOK_URL.includes('REPLACE_WITH_YOUR_WEBHOOK')) {
+              try {
+                const discordPayload = {
+                  embeds: [{
+                    title: `Ny ticket — ${formData.get('email') || 'Ingen epost'}`,
+                    description: formData.get('message') || '(ingen melding)',
+                    color: 5814783,
+                    fields: [
+                      { name: 'E-post', value: formData.get('email') || '—', inline: true },
+                      { name: 'Emne', value: formData.get('subject') || 'Ticket', inline: true }
+                    ],
+                    footer: { text: 'IT-BOT — ticket' },
+                    timestamp: new Date().toISOString()
+                  }]
+                };
+
+                const discordRes = await fetch(DISCORD_WEBHOOK_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(discordPayload)
+                });
+
+                if (!discordRes.ok) {
+                  console.warn('Discord webhook feilet', discordRes.status);
+                  statusDiv.innerHTML += ' (Sendt til Formspree, men ikke til Discord.)';
+                } else {
+                  statusDiv.innerHTML += ' (Varsel sendt til Discord.)';
+                }
+              } catch (err) {
+                console.warn('Feil ved sending til Discord:', err);
+                statusDiv.innerHTML += ' (Kun Formspree mottatt — Discord feilet.)';
+              }
+            } else {
+              statusDiv.innerHTML += ' (Husk å konfigurere DISCORD_WEBHOOK_URL i skriptet.)';
+            }
+
+            form.reset();
+          } else {
+            const json = await res.json().catch(()=>null);
+            statusDiv.innerHTML = 'Det skjedde en feil ved innsending.' + (json && json.error ? ' ' + json.error : '');
+          }
+        } catch (err) {
+          console.error(err);
+          statusDiv.innerHTML = 'Nettverksfeil ved innsending.';
+        }
+      });
 
       // initial scroll reveal
       scrollReveal();
